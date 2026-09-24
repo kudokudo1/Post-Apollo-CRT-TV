@@ -103,12 +103,14 @@ if [[ -f "$TV_GEOMETRY" ]]; then
 fi
 
 # ============================================================
-# 6. PASSIVE OUTSIDE TV BEZEL
+# 6. PASSIVE SCREEN BEZEL
 # ============================================================
 #
-# Start the chassis only after the three live TV members have been converted
-# to floating geometry. The bezel is decorative/passive: TvGeometry.py owns
-# its position and it is never allowed to become a geometry leader.
+# Start the screen bezel only after the three live TV members have been
+# converted to floating geometry. The bezel occupies the old Kitty screen bay:
+# Kitty is inset inside it, its right edge touches the SidePanel, and its bottom
+# edge touches the receiver. The bezel is decorative/passive: TvGeometry.py
+# owns its position and it is never allowed to become a geometry leader.
 
 if [[ -f "$BEZEL" ]]; then
     quickshell -p "$BEZEL" &
