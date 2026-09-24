@@ -50,6 +50,15 @@ TERMINAL_APP_ID = "post-apollo-terminal"
 SIDE_TITLE = "Post-Apollo Side"
 DECK_TITLE = "Post-Apollo Deck"
 
+BEZEL_TOP_TITLE = "Post-Apollo Bezel Top"
+BEZEL_LEFT_TITLE = "Post-Apollo Bezel Left"
+BEZEL_RIGHT_TITLE = "Post-Apollo Bezel Right"
+BEZEL_BOTTOM_TITLE = "Post-Apollo Bezel Bottom"
+
+# First-pass outside chassis thickness. Keep this centralized so the visual
+# component and the geometry follower can be tuned without changing authority.
+BEZEL_THICKNESS = 36
+
 
 class SwayIPC:
     def __init__(self) -> None:
@@ -156,6 +165,10 @@ def snapshot_from_tree(tree: dict[str, Any]) -> dict[str, Any]:
         "terminal": None,
         "side": None,
         "deck": None,
+        "bezel-top": None,
+        "bezel-left": None,
+        "bezel-right": None,
+        "bezel-bottom": None,
     }
 
     for node in walk_tree(tree):
@@ -178,6 +191,14 @@ def snapshot_from_tree(tree: dict[str, Any]) -> dict[str, Any]:
             result["side"] = entry
         elif result["deck"] is None and title == DECK_TITLE:
             result["deck"] = entry
+        elif result["bezel-top"] is None and title == BEZEL_TOP_TITLE:
+            result["bezel-top"] = entry
+        elif result["bezel-left"] is None and title == BEZEL_LEFT_TITLE:
+            result["bezel-left"] = entry
+        elif result["bezel-right"] is None and title == BEZEL_RIGHT_TITLE:
+            result["bezel-right"] = entry
+        elif result["bezel-bottom"] is None and title == BEZEL_BOTTOM_TITLE:
+            result["bezel-bottom"] = entry
 
     return result
 
@@ -189,6 +210,14 @@ def criteria(target: str) -> str:
         return f'[title="{SIDE_TITLE}"]'
     if target == "deck":
         return f'[title="{DECK_TITLE}"]'
+    if target == "bezel-top":
+        return f'[title="{BEZEL_TOP_TITLE}"]'
+    if target == "bezel-left":
+        return f'[title="{BEZEL_LEFT_TITLE}"]'
+    if target == "bezel-right":
+        return f'[title="{BEZEL_RIGHT_TITLE}"]'
+    if target == "bezel-bottom":
+        return f'[title="{BEZEL_BOTTOM_TITLE}"]'
     raise ValueError(f"Unknown TV target: {target}")
 
 
@@ -253,6 +282,13 @@ class TvBridge:
         )
 
     def desired_rects(self) -> dict[str, dict[str, int]]:
+        # The chassis bezel is a passive follower. It wraps the full bounding
+        # rectangle of screen + side panel + receiver, but never becomes a
+        # geometry leader itself.
+        tv_width = self.screen_width + self.side_width
+        tv_height = self.screen_height + self.deck_height
+        b = BEZEL_THICKNESS
+
         return {
             "terminal": {
                 "x": self.screen_x,
@@ -271,6 +307,30 @@ class TvBridge:
                 "y": self.screen_y + self.screen_height,
                 "width": self.screen_width,
                 "height": self.deck_height,
+            },
+            "bezel-top": {
+                "x": self.screen_x - b,
+                "y": self.screen_y - b,
+                "width": tv_width + (b * 2),
+                "height": b,
+            },
+            "bezel-left": {
+                "x": self.screen_x - b,
+                "y": self.screen_y,
+                "width": b,
+                "height": tv_height,
+            },
+            "bezel-right": {
+                "x": self.screen_x + tv_width,
+                "y": self.screen_y,
+                "width": b,
+                "height": tv_height,
+            },
+            "bezel-bottom": {
+                "x": self.screen_x - b,
+                "y": self.screen_y + tv_height,
+                "width": tv_width + (b * 2),
+                "height": b,
             },
         }
 
@@ -329,7 +389,15 @@ class TvBridge:
 
         desired = self.desired_rects()
 
-        for target in ("terminal", "side", "deck"):
+        for target in (
+            "terminal",
+            "side",
+            "deck",
+            "bezel-top",
+            "bezel-left",
+            "bezel-right",
+            "bezel-bottom",
+        ):
             self.queue_sync(
                 target,
                 desired[target],
@@ -407,20 +475,33 @@ class TvBridge:
 
         desired = self.desired_rects()
 
-        for target in ("terminal", "side", "deck"):
+        for target in (
+            "terminal",
+            "side",
+            "deck",
+            "bezel-top",
+            "bezel-left",
+            "bezel-right",
+            "bezel-bottom",
+        ):
             if target == focused:
                 continue
 
             node = snapshot.get(target)
 
-            # Kitty may be intentionally absent while the TV chassis remains.
+            # Kitty may be intentionally absent while the TV chassis remains,
+            # and bezel surfaces may map a moment after the core TV.
             if not node:
                 continue
 
             current = node.get("rect")
 
             if not self.rect_equal(current, desired[target]):
-                self.queue_sync(target, desired[target])
+                self.queue_sync(
+                    target,
+                    desired[target],
+                    setup=target.startswith("bezel-"),
+                )
 
     def command_loop(self) -> None:
         while not self.stop_event.is_set():

@@ -3,6 +3,7 @@
 SIDE="$HOME/.config/post-apollo-tv/side.qml"
 DECK="$HOME/.config/post-apollo-tv/deck.qml"
 TV_GEOMETRY="$HOME/.config/post-apollo-tv/TvGeometry.py"
+BEZEL="$HOME/.config/post-apollo-tv/bezel.qml"
 
 wait_for_app_id() {
     local app_id="$1"
@@ -101,7 +102,19 @@ if [[ -f "$TV_GEOMETRY" ]]; then
         >"$HOME/.cache/post-apollo-tv-geometry.log" 2>&1 &
 fi
 
+# ============================================================
+# 6. PASSIVE OUTSIDE TV BEZEL
+# ============================================================
+#
+# Start the chassis only after the three live TV members have been converted
+# to floating geometry. The bezel is decorative/passive: TvGeometry.py owns
+# its position and it is never allowed to become a geometry leader.
+
+if [[ -f "$BEZEL" ]]; then
+    quickshell -p "$BEZEL" &
+fi
+
 # Return keyboard focus to the actual terminal.
-sleep 0.10
+sleep 0.12
 swaymsg '[app_id="post-apollo-terminal"] focus'
 
