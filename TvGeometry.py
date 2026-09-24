@@ -264,6 +264,12 @@ class TvBridge:
 
         self.initialized = False
 
+        # Startup admission gate. New bezel toplevels can briefly perturb Sway
+        # while they map. During this window we preserve the canonical geometry
+        # captured at bootstrap and refuse to treat those transient changes as
+        # user intent.
+        self.admission_until = 0.0
+
         # Canonical TV geometry. The terminal is the screen slot.
         self.screen_x = 0
         self.screen_y = 0
@@ -402,6 +408,31 @@ class TvBridge:
 
         desired = self.desired_rects()
 
+        # While the TV is admitting its new passive bezel surfaces, transient
+        # compositor layout changes are not authoritative. Keep pushing the
+        # captured canonical layout until the scene is stable.
+        if time.monotonic() < self.admission_until:
+            for target in (
+                "terminal",
+                "side",
+                "deck",
+                "bezel-top",
+                "bezel-left",
+                "bezel-right",
+                "bezel-bottom",
+            ):
+                node = snapshot.get(target)
+                if not node:
+                    continue
+                current = node.get("rect")
+                if not self.rect_equal(current, desired[target]):
+                    self.queue_sync(
+                        target,
+                        desired[target],
+                        setup=target.startswith("bezel-"),
+                    )
+            return
+
         for target in (
             "terminal",
             "side",
@@ -419,6 +450,7 @@ class TvBridge:
             )
 
         self.initialized = True
+        self.admission_until = time.monotonic() + 0.75
 
         print(
             "TvGeometry: initialized "
