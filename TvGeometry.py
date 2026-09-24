@@ -282,19 +282,31 @@ class TvBridge:
         )
 
     def desired_rects(self) -> dict[str, dict[str, int]]:
-        # The chassis bezel is a passive follower. It wraps the full bounding
-        # rectangle of screen + side panel + receiver, but never becomes a
-        # geometry leader itself.
-        tv_width = self.screen_width + self.side_width
-        tv_height = self.screen_height + self.deck_height
+        # self.screen_* is the canonical OUTER screen bay: the rectangular
+        # space that used to be occupied entirely by Kitty. The new bezel lives
+        # INSIDE that bay. Kitty becomes the inset glass/screen area while the
+        # side panel and receiver stay attached to the bay's old outside edges.
+        #
+        # This is intentionally not an outside-TV case:
+        #
+        #   ┌──────────── bezel top ────────────┐┌─ side ─┐
+        #   │ ┌──────── Kitty / Zellij ───────┐ ││        │
+        #   │ │                               │ ││        │
+        #   │ └───────────────────────────────┘ ││        │
+        #   └────────── bezel bottom ───────────┘└────────┘
+        #   ┌──────────── receiver / DVD ───────┐
+        #
+        # The bezel is still a passive follower; it never becomes authority.
         b = BEZEL_THICKNESS
+        inner_width = max(1, self.screen_width - (b * 2))
+        inner_height = max(1, self.screen_height - (b * 2))
 
         return {
             "terminal": {
-                "x": self.screen_x,
-                "y": self.screen_y,
-                "width": self.screen_width,
-                "height": self.screen_height,
+                "x": self.screen_x + b,
+                "y": self.screen_y + b,
+                "width": inner_width,
+                "height": inner_height,
             },
             "side": {
                 "x": self.screen_x + self.screen_width,
@@ -309,27 +321,27 @@ class TvBridge:
                 "height": self.deck_height,
             },
             "bezel-top": {
-                "x": self.screen_x - b,
-                "y": self.screen_y - b,
-                "width": tv_width + (b * 2),
+                "x": self.screen_x,
+                "y": self.screen_y,
+                "width": self.screen_width,
                 "height": b,
             },
             "bezel-left": {
-                "x": self.screen_x - b,
-                "y": self.screen_y,
+                "x": self.screen_x,
+                "y": self.screen_y + b,
                 "width": b,
-                "height": tv_height,
+                "height": inner_height,
             },
             "bezel-right": {
-                "x": self.screen_x + tv_width,
-                "y": self.screen_y,
+                "x": self.screen_x + self.screen_width - b,
+                "y": self.screen_y + b,
                 "width": b,
-                "height": tv_height,
+                "height": inner_height,
             },
             "bezel-bottom": {
-                "x": self.screen_x - b,
-                "y": self.screen_y + tv_height,
-                "width": tv_width + (b * 2),
+                "x": self.screen_x,
+                "y": self.screen_y + self.screen_height - b,
+                "width": self.screen_width,
                 "height": b,
             },
         }
@@ -377,8 +389,9 @@ class TvBridge:
         sr = side["rect"]
         dr = deck["rect"]
 
-        # Preserve the layout the launcher already created, then convert the
-        # three members to floating windows without visually changing the TV.
+        # Preserve the outer screen bay the launcher already created. Kitty
+        # initially occupies that whole bay; after bootstrap it is inset by the
+        # bezel while the side panel and receiver keep their original edges.
         self.screen_x = int(tr["x"])
         self.screen_y = int(tr["y"])
         self.screen_width = max(1, int(tr["width"]))
@@ -446,10 +459,14 @@ class TvBridge:
         if focused == "terminal" and terminal:
             r = terminal["rect"]
 
-            self.screen_x = int(r["x"])
-            self.screen_y = int(r["y"])
-            self.screen_width = max(1, int(r["width"]))
-            self.screen_height = max(1, int(r["height"]))
+            # Kitty is now the INNER screen. Reconstruct the canonical outer
+            # screen bay from it so moving/resizing Kitty still moves/resizes
+            # the whole television correctly.
+            b = BEZEL_THICKNESS
+            self.screen_x = int(r["x"]) - b
+            self.screen_y = int(r["y"]) - b
+            self.screen_width = max(1, int(r["width"]) + (b * 2))
+            self.screen_height = max(1, int(r["height"]) + (b * 2))
 
         elif focused == "side":
             r = side["rect"]
