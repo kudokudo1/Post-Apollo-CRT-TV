@@ -113,10 +113,15 @@ fi
 # owns its position and it is never allowed to become a geometry leader.
 
 if [[ -f "$BEZEL" ]]; then
+    # These are ordinary Wayland toplevels. Tell Sway they are floating BEFORE
+    # they map so they cannot enter the tiling tree and collapse the screen/deck
+    # geometry during startup.
+    swaymsg 'for_window [title="^Post-Apollo Bezel (Top|Left|Right|Bottom)$"] floating enable, border none' >/dev/null
+
     quickshell -p "$BEZEL" &
 fi
 
 # Return keyboard focus to the actual terminal.
-sleep 0.12
+sleep 0.80
 swaymsg '[app_id="post-apollo-terminal"] focus'
 
