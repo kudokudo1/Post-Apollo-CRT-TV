@@ -8,7 +8,9 @@ ShellRoot {
         implicitWidth: 1200
         implicitHeight: 36
         color: "transparent"
-        flags: Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus
+        // FloatingWindow does not expose Qt.Window flags in Quickshell 0.2.1.
+        // An empty input mask makes this visual chassis fully click-through.
+        mask: Region { width: 0; height: 0 }
 
         TvBezel {
             anchors.fill: parent
@@ -22,7 +24,9 @@ ShellRoot {
         implicitWidth: 36
         implicitHeight: 900
         color: "transparent"
-        flags: Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus
+        // FloatingWindow does not expose Qt.Window flags in Quickshell 0.2.1.
+        // An empty input mask makes this visual chassis fully click-through.
+        mask: Region { width: 0; height: 0 }
 
         TvBezel {
             anchors.fill: parent
@@ -36,7 +40,9 @@ ShellRoot {
         implicitWidth: 36
         implicitHeight: 900
         color: "transparent"
-        flags: Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus
+        // FloatingWindow does not expose Qt.Window flags in Quickshell 0.2.1.
+        // An empty input mask makes this visual chassis fully click-through.
+        mask: Region { width: 0; height: 0 }
 
         TvBezel {
             anchors.fill: parent
@@ -50,7 +56,9 @@ ShellRoot {
         implicitWidth: 1200
         implicitHeight: 36
         color: "transparent"
-        flags: Qt.FramelessWindowHint | Qt.WindowDoesNotAcceptFocus
+        // FloatingWindow does not expose Qt.Window flags in Quickshell 0.2.1.
+        // An empty input mask makes this visual chassis fully click-through.
+        mask: Region { width: 0; height: 0 }
 
         TvBezel {
             anchors.fill: parent
