@@ -1,6 +1,6 @@
 ✦︎✦︎✦︎ Meta Apollo Logos //
 
-# 🖳 POST-APOLLO // TV
+# 🖳 POST-APOLLO + ZELLIJ // CRT-T.V
 
 ![](BUILD/assets/design/chassis/focus-rail.svg)
 
