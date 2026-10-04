@@ -4,9 +4,13 @@
 
 ![](BUILD/assets/design/chassis/focus-rail.svg)
 
+![Post-Apollo + Zellij // CRT-T.V](./BUILD/assets/design/crt-tv-banner.svg)
+
 > **STATE //** active \~\~ **VIEW //** Zellij TV / receiver surface
 
-> **Post-Apollo TV is the receiver-style control shell around Zellij, including the side panel, deck, geometry, and launch helpers.**
+The receiver-style control layer of the Post-Apollo Terminal Family — enhancing the relationship between operator, controls, terminal workspace, and screen space, turning a collection of software panes into a spatially organized piece of equipment with persistent, tactile controls, layout, and identity.
+
+**FAMILY //** [META APOLLO LOGOS](https://github.com/kudokudo1/Meta-Apollo-Logos) · [DEV EXP](https://github.com/kudokudo1/The-Post-Apollo-Dev-Exp) · [FOREST](https://github.com/kudokudo1/The-Post-Apollo-Forest-Project) · [TASKBARS](https://github.com/kudokudo1/taskbars-post-apollo)
 
 ### 🧭 MAP // REPOSITORY
 
