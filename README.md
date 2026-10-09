@@ -23,3 +23,12 @@ The receiver-style control layer of the Post-Apollo Terminal Family — enhancin
 ### ★⋆˙ CORE // RUNTIME LAYOUT
 
 The seven rooms are a semantic documentation layer. Existing live files remain in their current paths unless the runtime itself is intentionally migrated.
+
+## Zellij relationship
+
+CRT-T.V is a Post-Apollo control/presentation layer designed around a Zellij terminal workspace.
+
+This repository does not vendor the Zellij source tree. Its tracked implementation is the Post-Apollo QML/Python/control surface and launch integration that operates with Zellij as a separate runtime dependency.
+
+Zellij remains a separate upstream project under its own license. The separate `Post-Apollo-Zellij` repository documents the generated Zellij configuration and custom Post-Apollo plugin boundary in more detail.
+
