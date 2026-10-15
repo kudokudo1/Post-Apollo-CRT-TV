@@ -12,6 +12,8 @@ The receiver-style control layer of the Post-Apollo Terminal Family — enhancin
 
 **FAMILY //** [META APOLLO LOGOS](https://github.com/kudokudo1/Meta-Apollo-Logos) · [DEV EXP](https://github.com/kudokudo1/The-Post-Apollo-Dev-Exp) · [FOREST](https://github.com/kudokudo1/The-Post-Apollo-Forest-Project) · [POST-APOLLO PROJECT](https://github.com/kudokudo1/The-Post-Apollo-Project)
 
+**RULES //** [Syntagma // shared operator and AI working rules](https://github.com/kudokudo1/Meta-Apollo-Logos-How-I-Think/blob/main/AGENTS.md) · [Meta Apollo design grammar](https://github.com/kudokudo1/Meta-Apollo-Logos/blob/main/MODEL/Repo-Design-Language.md) · [Local technical documentation](./MODEL/README.md)
+
 ### 🧭 MAP // REPOSITORY
 
 ![](BUILD/assets/design/chassis/nav-rail.svg)
